@@ -24,7 +24,20 @@ type Props = {
   onResult: (result: ActionResult, success: string) => void;
 };
 
-const iconBtn =
+/** Saves (or clears, with "") a row's link — extras by id, scheduled by class. */
+export function saveRowUrl(row: ClassRow, date: string, url: string) {
+  return row.recordingId !== null && row.gradeId === null
+    ? updateRecording({ id: row.recordingId, url })
+    : saveScheduledRecording({
+        classDate: date,
+        gradeId: row.gradeId!,
+        subjectId: row.subjectId!,
+        url,
+        isCancelled: row.isCancelled,
+      });
+}
+
+export const iconBtn =
   "inline-flex items-center justify-center size-9 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-40";
 
 export default function RecordingRow({
@@ -66,16 +79,7 @@ export default function RecordingRow({
   function saveUrl(value: string) {
     if (value.trim() === committed) return;
     persist(
-      () =>
-        row.recordingId !== null && row.gradeId === null
-          ? updateRecording({ id: row.recordingId, url: value })
-          : saveScheduledRecording({
-              classDate: date,
-              gradeId: row.gradeId!,
-              subjectId: row.subjectId!,
-              url: value,
-              isCancelled: row.isCancelled,
-            }),
+      () => saveRowUrl(row, date, value),
       value.trim() ? "Link saved." : "Link cleared.",
       () => setDraft(committed)
     );

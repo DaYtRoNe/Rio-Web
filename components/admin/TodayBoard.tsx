@@ -14,6 +14,7 @@ import type { MessageItem } from "@/lib/message";
 import type { ActionResult, Grade, Section, Subject } from "@/lib/types";
 import RecordingRow from "./RecordingRow";
 import MessagePanel from "./MessagePanel";
+import QuickLink, { type LinkTarget } from "./QuickLink";
 import AddExtraClass from "./AddExtraClass";
 
 export type ClassRow = {
@@ -133,6 +134,28 @@ export default function TodayBoard({
     isCancelled: row.isCancelled,
   }));
 
+  // Classes still waiting for a link: the ones whose titles were copied come
+  // first, newest first, since that's the video that was just uploaded.
+  const linkTargets = useMemo(() => {
+    const waiting = new Map<string, LinkTarget>();
+    if (canRecord) {
+      for (const item of items) {
+        if (!item.row.isCancelled && !item.row.url) waiting.set(item.row.key, item);
+      }
+    }
+    const order = [lastKey, ...[...copied].reverse()];
+    const fromCopied: LinkTarget[] = [];
+    for (const key of order) {
+      const target = key ? waiting.get(key) : undefined;
+      if (target) {
+        fromCopied.push(target);
+        waiting.delete(key!);
+      }
+    }
+    return { copied: fromCopied, rest: [...waiting.values()] };
+  }, [items, copied, lastKey, canRecord]);
+  const hasLinkTargets = linkTargets.copied.length + linkTargets.rest.length > 0;
+
   async function copyTitle(key: string, title: string) {
     await toClipboard(title);
     markCopied(key);
@@ -188,69 +211,82 @@ export default function TodayBoard({
         </p>
       )}
 
-      {/* Next up — the title-copying surface */}
-      {canCopy && !empty && (
+      {/* Next up — copy the title, then drop the link in right below it */}
+      {!empty && (canCopy || hasLinkTargets) && (
         <section className="sticky top-0 z-20 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden">
-          <div className="px-4 md:px-6 pt-4 flex items-center justify-between gap-3">
-            <span className="font-label-sm uppercase tracking-wide text-on-surface-variant">
-              {next ? "Next title" : "All titles copied"}
-            </span>
-            <span className="font-label-md text-on-surface-variant tabular-nums">
-              {doneCount} / {activeCount} copied
-            </span>
-          </div>
+          {canCopy && (
+            <>
+              <div className="px-4 md:px-6 pt-4 flex items-center justify-between gap-3">
+                <span className="font-label-sm uppercase tracking-wide text-on-surface-variant">
+                  {next ? "Next title" : "All titles copied"}
+                </span>
+                <span className="font-label-md text-on-surface-variant tabular-nums">
+                  {doneCount} / {activeCount} copied
+                </span>
+              </div>
 
-          <div className="px-4 md:px-6 pt-2">
-            <div className="h-1.5 rounded-full bg-surface-variant overflow-hidden">
-              <div
-                className="h-full bg-primary transition-[width] duration-300"
-                style={{ width: `${percent}%` }}
-              />
-            </div>
-          </div>
+              <div className="px-4 md:px-6 pt-2">
+                <div className="h-1.5 rounded-full bg-surface-variant overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-[width] duration-300"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
 
-          <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            {next ? (
-              <>
-                <p className="flex-1 min-w-0 font-body-lg text-on-surface break-words">
-                  {next.title}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => copyTitle(next.row.key, next.title)}
-                  className={`shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-label-md font-medium transition-colors ${
-                    flash === next.row.key
-                      ? "bg-secondary-container text-on-secondary-container"
-                      : "bg-primary text-on-primary hover:shadow-md"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-xl">
-                    {flash === next.row.key ? "check" : "content_copy"}
-                  </span>
-                  Copy title
-                  <kbd className="hidden md:inline text-xs opacity-70 border border-current/40 rounded px-1">
-                    C
-                  </kbd>
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="flex-1 font-body-lg text-on-surface-variant">
-                  {needle
-                    ? "Everything matching this search is copied."
-                    : `All ${activeCount} titles copied for ${WEEKDAYS[weekday]}.`}
-                </p>
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-label-md border border-outline-variant/60 text-on-surface hover:border-primary hover:text-primary transition-colors"
-                >
-                  <span className="material-symbols-outlined text-lg">restart_alt</span>
-                  Start over
-                </button>
-              </>
-            )}
-          </div>
+              <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                {next ? (
+                  <>
+                    <p className="flex-1 min-w-0 font-body-lg text-on-surface break-words">
+                      {next.title}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => copyTitle(next.row.key, next.title)}
+                      className={`shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-label-md font-medium transition-colors ${
+                        flash === next.row.key
+                          ? "bg-secondary-container text-on-secondary-container"
+                          : "bg-primary text-on-primary hover:shadow-md"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-xl">
+                        {flash === next.row.key ? "check" : "content_copy"}
+                      </span>
+                      Copy title
+                      <kbd className="hidden md:inline text-xs opacity-70 border border-current/40 rounded px-1">
+                        C
+                      </kbd>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="flex-1 font-body-lg text-on-surface-variant">
+                      {needle
+                        ? "Everything matching this search is copied."
+                        : `All ${activeCount} titles copied for ${WEEKDAYS[weekday]}.`}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={reset}
+                      className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-label-md border border-outline-variant/60 text-on-surface hover:border-primary hover:text-primary transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg">restart_alt</span>
+                      Start over
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          {hasLinkTargets && (
+            <QuickLink
+              copied={linkTargets.copied}
+              rest={linkTargets.rest}
+              date={date}
+              onResult={handleResult}
+            />
+          )}
         </section>
       )}
 
