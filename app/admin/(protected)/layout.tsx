@@ -72,11 +72,15 @@ export default async function AdminLayout({
   return (
     <div className="admin-theme min-h-screen flex flex-col bg-surface-container-low text-on-surface">
       <header className="bg-surface-container-lowest border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-        <div className="max-w-max-width mx-auto px-margin-mobile lg:px-margin-desktop h-16 flex items-center justify-between gap-4">
+        <div className="max-w-max-width mx-auto px-margin-mobile lg:px-margin-desktop py-2 md:py-0 md:h-16 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-1">
           <span className="font-title-lg text-primary font-bold tracking-tight whitespace-nowrap">
             Rio Admin
           </span>
-          <AdminNav items={items} />
+          {/* Own row on phones so every icon fits without a hidden scroll. */}
+          <AdminNav
+            items={items}
+            className="order-last md:order-none w-full md:w-auto justify-between md:justify-start"
+          />
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <form action={logout} className="flex items-center gap-3">
@@ -95,7 +99,7 @@ export default async function AdminLayout({
                 className="font-label-md text-on-surface-variant hover:text-error transition-colors flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-xl">logout</span>
-                <span className="hidden sm:inline">Sign out</span>
+                <span className="hidden sm:inline whitespace-nowrap">Sign out</span>
               </button>
             </form>
           </div>

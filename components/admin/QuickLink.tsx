@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { isYouTubeUrl } from "@/lib/youtube";
 import type { ActionResult } from "@/lib/types";
-import { iconBtn, saveRowUrl } from "./RecordingRow";
+import { saveRowUrl } from "./RecordingRow";
 import type { ClassRow } from "./TodayBoard";
 
 export type LinkTarget = { row: ClassRow; title: string };
@@ -27,7 +27,7 @@ function isField(el: EventTarget | null) {
 /**
  * The link half of the upload loop, living in the sticky bar next to the title
  * you just copied. Copy the title, paste it into YouTube, copy the video link,
- * come back and press Ctrl+V — no scrolling to find the row.
+ * come back and tap Paste (or press Ctrl+V) — no scrolling to find the row.
  *
  * Defaults to the most recently copied class that still needs a link; the
  * picker covers the case where uploads finish out of order.
@@ -91,12 +91,12 @@ export default function QuickLink({ copied, rest, date, onResult }: Props) {
   );
 
   return (
-    <div className="px-4 md:px-6 py-3 border-t border-outline-variant/20 bg-surface-container-low/60 flex flex-col md:flex-row md:items-center gap-2">
+    <div className="px-4 md:px-6 py-2.5 md:py-3 border-t border-outline-variant/20 bg-surface-container-low/60 flex flex-col md:flex-row md:items-center gap-2">
       <label className="flex items-center gap-2 min-w-0 md:max-w-[50%]">
         <span className="material-symbols-outlined text-lg text-primary shrink-0">
           add_link
         </span>
-        <span className="font-label-sm uppercase tracking-wide text-on-surface-variant shrink-0">
+        <span className="hidden sm:inline font-label-sm uppercase tracking-wide text-on-surface-variant shrink-0">
           Link for
         </span>
         {all.length > 1 ? (
@@ -142,7 +142,7 @@ export default function QuickLink({ copied, rest, date, onResult }: Props) {
             if (e.key === "Escape") setDraft("");
           }}
           disabled={pending}
-          placeholder="Paste the YouTube link — Ctrl+V works anywhere"
+          placeholder="YouTube link"
           spellCheck={false}
           aria-label={`YouTube link for ${target.title}`}
           className="flex-1 min-w-0 rounded-lg border border-outline-variant/60 bg-surface px-3 py-1.5 font-mono text-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
@@ -151,11 +151,15 @@ export default function QuickLink({ copied, rest, date, onResult }: Props) {
           type="button"
           onClick={pasteFromClipboard}
           disabled={pending}
-          title="Paste from clipboard"
+          title="Paste from clipboard (or Ctrl+V anywhere)"
           aria-label="Paste link from clipboard"
-          className={iconBtn}
+          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-on-primary font-label-md font-medium hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-shadow disabled:opacity-40"
         >
-          <span className="material-symbols-outlined text-xl">content_paste</span>
+          <span className="material-symbols-outlined text-lg">content_paste</span>
+          Paste
+          <kbd className="hidden md:inline text-xs opacity-70 border border-current/40 rounded px-1">
+            Ctrl V
+          </kbd>
         </button>
         {pending && (
           <span

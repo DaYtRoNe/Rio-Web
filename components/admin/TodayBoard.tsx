@@ -198,10 +198,11 @@ export default function TodayBoard({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Floats at the bottom so it's seen wherever the page is scrolled to. */}
       {notice && (
         <p
           role="status"
-          className={`px-4 py-2.5 rounded-xl font-label-md ${
+          className={`fixed z-50 inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] md:left-auto md:right-6 md:max-w-md px-4 py-3 rounded-xl shadow-lg font-label-md ${
             notice.kind === "ok"
               ? "bg-secondary-container text-on-secondary-container"
               : "bg-error-container text-on-error-container"
@@ -216,7 +217,7 @@ export default function TodayBoard({
         <section className="sticky top-0 z-20 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden">
           {canCopy && (
             <>
-              <div className="px-4 md:px-6 pt-4 flex items-center justify-between gap-3">
+              <div className="px-4 md:px-6 pt-3 md:pt-4 flex items-center justify-between gap-3">
                 <span className="font-label-sm uppercase tracking-wide text-on-surface-variant">
                   {next ? "Next title" : "All titles copied"}
                 </span>
@@ -234,16 +235,17 @@ export default function TodayBoard({
                 </div>
               </div>
 
-              <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="px-4 md:px-6 py-3 md:py-4 flex items-center gap-3">
                 {next ? (
                   <>
-                    <p className="flex-1 min-w-0 font-body-lg text-on-surface break-words">
+                    <p className="flex-1 min-w-0 text-base leading-6 md:text-lg md:leading-7 text-on-surface break-words">
                       {next.title}
                     </p>
                     <button
                       type="button"
                       onClick={() => copyTitle(next.row.key, next.title)}
-                      className={`shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-label-md font-medium transition-colors ${
+                      aria-label="Copy title"
+                      className={`shrink-0 inline-flex items-center justify-center gap-2 px-3.5 sm:px-5 py-3 rounded-xl font-label-md font-medium transition-colors ${
                         flash === next.row.key
                           ? "bg-secondary-container text-on-secondary-container"
                           : "bg-primary text-on-primary hover:shadow-md"
@@ -252,7 +254,7 @@ export default function TodayBoard({
                       <span className="material-symbols-outlined text-xl">
                         {flash === next.row.key ? "check" : "content_copy"}
                       </span>
-                      Copy title
+                      <span className="hidden sm:inline">Copy title</span>
                       <kbd className="hidden md:inline text-xs opacity-70 border border-current/40 rounded px-1">
                         C
                       </kbd>
@@ -260,7 +262,7 @@ export default function TodayBoard({
                   </>
                 ) : (
                   <>
-                    <p className="flex-1 font-body-lg text-on-surface-variant">
+                    <p className="flex-1 min-w-0 text-base leading-6 md:text-lg md:leading-7 text-on-surface-variant">
                       {needle
                         ? "Everything matching this search is copied."
                         : `All ${activeCount} titles copied for ${WEEKDAYS[weekday]}.`}

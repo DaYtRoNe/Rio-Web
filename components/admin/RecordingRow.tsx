@@ -37,8 +37,8 @@ export function saveRowUrl(row: ClassRow, date: string, url: string) {
       });
 }
 
-export const iconBtn =
-  "inline-flex items-center justify-center size-9 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-40";
+const iconBtn =
+  "shrink-0 inline-flex items-center justify-center size-10 md:size-9 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-40";
 
 export default function RecordingRow({
   row,
@@ -143,7 +143,7 @@ export default function RecordingRow({
         )}
 
         <span
-          className={`flex-1 min-w-0 font-body-lg break-words ${
+          className={`flex-1 min-w-0 text-base leading-6 md:text-lg md:leading-7 break-words ${
             row.isCancelled
               ? "text-on-surface-variant line-through decoration-1"
               : isCopied

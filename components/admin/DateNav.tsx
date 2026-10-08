@@ -8,7 +8,7 @@ import { addDays, WEEKDAYS, weekdayOf } from "@/lib/date";
 import Clock from "./Clock";
 
 const btn =
-  "inline-flex items-center gap-1 px-3 py-2 rounded-xl font-label-md border border-outline-variant/60 bg-surface-container-lowest text-on-surface hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors";
+  "shrink-0 inline-flex items-center gap-1 px-2 sm:px-3 py-2 rounded-xl font-label-md border border-outline-variant/60 bg-surface-container-lowest text-on-surface hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors";
 
 /** Small spinner shown inside a <Link> while its navigation is in flight. */
 function Pending() {
@@ -57,21 +57,25 @@ export default function DateNav({ date, today }: { date: string; today: string }
         </p>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2">
         <input
           type="date"
           value={date}
           onChange={(e) => goTo(e.target.value)}
           aria-label="Jump to date"
-          className="rounded-xl border border-outline-variant/60 bg-surface px-3 py-2 font-body-md text-on-surface outline-none focus:border-primary"
+          className="flex-1 lg:flex-none min-w-0 rounded-xl border border-outline-variant/60 bg-surface px-3 py-2 font-body-md text-on-surface outline-none focus:border-primary"
         />
         <Link href={`/admin?d=${addDays(date, -1)}`} className={btn}>
           <span className="material-symbols-outlined text-lg">chevron_left</span>
           <span className="hidden sm:inline">Previous</span>
           <Pending />
         </Link>
-        <Link href="/admin" className={btn}>
-          Today
+        <Link href="/admin" aria-label="Go to today" className={btn}>
+          {/* The icon font forces inline-block, so hide a wrapper instead. */}
+          <span className="sm:hidden inline-flex">
+            <span className="material-symbols-outlined text-lg">today</span>
+          </span>
+          <span className="hidden sm:inline">Today</span>
           <Pending />
         </Link>
         <Link href={`/admin?d=${addDays(date, 1)}`} className={btn}>
