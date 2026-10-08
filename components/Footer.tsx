@@ -14,7 +14,7 @@ export default function Footer() {
             <img
               alt="Rio Online School"
               className="h-10 w-auto"
-              src="https://lh3.googleusercontent.com/aida/AP1WRLsKnGqOQDBrNxe3rGhXTZ9dxqkKey3EIsQIp-1bbmP3n1-dTbZn7ytc9MQupQzPdIPpoiKr_jbESSFnDzP-ygAf97eAnhPV98ETwJ8RZTHYWCnDx7rb5OkXkxrfDO5UrMTD4LAnpvgTSFAVhVH1bVRsyaxC5EGWhfU-qFEiddQBXFRSaE1Jv9hOMFOcjaC9Ff0bs3WQD_vTzpmAWB4YJFOBqb8VUqx5PSUCnMFH3ewCXJUMcr7DRhr7VTA6EO-g6OxbT43ohec"
+              src="/logo-mark.png"
             />
             <span className="font-title-lg text-title-lg text-primary font-bold">
               Rio Online School
